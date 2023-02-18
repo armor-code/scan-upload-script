@@ -1,50 +1,38 @@
-# Time & date of script download: Thu Feb 09 2023 17:45:57 GMT+0530 (India Standard Time)
-## Import libraries
-# !/usr/bin/env python
-import time
 import os
 import glob
 import json
-import logging
 from datetime import datetime
 from urllib.request import urlopen, Request
 import sys
 
-## Variable to define####
-product=name = os.environ.get("product")
-subProduct=os.environ.get("subProduct")
-environment=os.environ.get("environment")
+def getParam(param_name, isSecret=False):
+    param = os.environ.get(param_name)
+    if not bool(param and param.strip()):
+        print("\n\n ############# Mandatory parameter: " + param_name + " not present\n\n")
+        raise Exception("Mandatory parameter: " + param_name + " not present")
+    if isSecret:
+        print(param_name + ": " + param[0:2] + " ***** " + param[-2:])
+    else:
+        print(param_name + ": " + param)
+    return param
 
-file_extension = os.environ.get("fileExtension")
-scanTool=os.environ.get("scanTool")
+print('------------------------------------------')
+print('Start at: ' + datetime.now().strftime('%d/%m/%Y %H:%M:%S'))
+print("\n")
 
-api_key=os.environ.get("apiKey")  ## Kindly download the API Key from ArmorCode website and place it here.
+## Set variable from env variables
+product = getParam("product")
+subProduct = getParam("subProduct")
+environment = getParam("environment")
 
+file_extension = getParam("fileExtension")
+scanTool = getParam("scanTool")
+
+api_key = getParam("apiKey", isSecret=True)  ## Kindly download the API Key from ArmorCode website and place it here.
 
 folder_name=r"/data"
-
-## Initiating the logger
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s: %(message)s -- %(asctime)s',
-                    datefmt='%Y-%m-%d %I:%M:%S %p')
-
-## Initiating the log writing
-logging.info('------------------------------------------')
-logging.info("product: " + product)
-logging.info("subProduct: " + subProduct)
-logging.info("environment: " + environment)
-logging.info("file_extension: " + file_extension)
-logging.info("api_key: " + api_key)
-logging.info("scanTool: " + scanTool)
-
-logging.info("\nScan started")
-
-SCRIPT_VERSION = '1.0'
-logging.info('Script Version : ' + SCRIPT_VERSION)
-
-
 ## Endpoint to fetch secure one-time url to upload scan files
 url_upload = 'https://app.armorcode.com/client/utils/scan/upload'
-
 
 ## Headers for accessing the upload url
 headers = {
@@ -52,7 +40,6 @@ headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
 }
-
 
 ## Metadata of the scan tool
 data_json = {
@@ -65,7 +52,6 @@ data_json = {
     'directory': folder_name ,
     'fileExtension': file_extension
 }
-
 
 def get_latest_file(folder_name, file_extension):
     '''
@@ -83,9 +69,9 @@ def get_latest_file(folder_name, file_extension):
             files.append(file_name)
         if files:
             latest_file = max(files, key=os.path.getmtime)
-            logging.info('latest file identified : ' + latest_file)
+            print('latest file identified : ' + latest_file)
         else:
-            logging.error('No such file found in the directory.')
+            logging.error('No matching file found for scan upload')
     except Exception as e:
         logging.error('Error in getting latest file: ' + str(e))
     return latest_file
@@ -111,8 +97,8 @@ def get_signed_url(url, header, json_data):
             response_json = json.loads(response.read().decode())
             url_signed = response_json.get('signedUrl', '')
     except Exception as e:
-        logging.error('Failed to fetch signed url: ' + e)
-        pass
+        logging.error('Failed to fetch signed url: ' + str(e))
+
     return url_signed
 
 
@@ -162,14 +148,14 @@ def main():
 
             import_flag = upload_file(url_upload, headers, data_json)
             if import_flag:
-                logging.info('\nFile upload Successful.\n')
+                print('\nFile upload Successful.\n')
             else:
                 logging.error('\nFile upload failed.\n')
 
     except Exception as e:
         logging.error('Error in processing latest file: ' + str(e))
 
-    logging.info('Finished at: ' + datetime.now().strftime('%d/%m/%Y %H:%M:%S'))
+    print('Finished at: ' + datetime.now().strftime('%d/%m/%Y %H:%M:%S'))
 
     return 1
 

@@ -5,5 +5,5 @@ build the docker image
 
 
 Example of passing parameters to the script
-  docker run -v ${PWD}:/data -e product=$PRODUCT -e subProduct=$SUBPRODUCT -e environment=$ENV -e fileExtension=$EXTENSION -e scanTool=$SCANTOOL -e apiKey=$API_KEY armorcode-scan-upload
+  docker run -v "${PWD}":/data -e product="$PRODUCT" -e subProduct="$SUBPRODUCT" -e environment="$ENV" -e fileExtension="$EXTENSION" -e scanTool="$SCANTOOL" -e apiKey="$API_KEY" armorcode-scan-upload
 
