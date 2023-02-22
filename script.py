@@ -71,9 +71,9 @@ def get_latest_file(folder_name, file_extension):
             latest_file = max(files, key=os.path.getmtime)
             print('latest file identified : ' + latest_file)
         else:
-            logging.error('No matching file found for scan upload')
+            print('No matching file found for scan upload')
     except Exception as e:
-        logging.error('Error in getting latest file: ' + str(e))
+        print('Error in getting latest file: ' + str(e))
     return latest_file
 
 
@@ -88,7 +88,7 @@ def get_signed_url(url, header, json_data):
     url_signed = ''
     try:
         if 'please_insert_api_key_here' in header['Authorization']:
-            logging.error('API Key not updated, kindly update the API Key to run this script.')
+            print('API Key not updated, kindly update the API Key to run this script.')
             return url_signed
 
         postdata = json.dumps(json_data).encode()
@@ -97,7 +97,7 @@ def get_signed_url(url, header, json_data):
             response_json = json.loads(response.read().decode())
             url_signed = response_json.get('signedUrl', '')
     except Exception as e:
-        logging.error('Failed to fetch signed url: ' + str(e))
+        print('Failed to fetch signed url: ' + str(e))
 
     return url_signed
 
@@ -117,7 +117,7 @@ def upload_file(url_api, headers, json_data):
         url_signed = get_signed_url(url_api, headers, json_data)
         ##print(url_signed)
         if not url_signed:
-            logging.error('Signed Url not generated.')
+            print('Signed Url not generated.')
             return 0
 
         contents = ''
@@ -126,7 +126,7 @@ def upload_file(url_api, headers, json_data):
         request = Request(url_signed, data=contents,  method="PUT")
         urlopen(request, timeout=100) 
     except Exception as e:
-        logging.error('Failed to upload file: ' + str(e))
+        print('Failed to upload file: ' + str(e))
         return 0
     return 1
 
@@ -150,10 +150,10 @@ def main():
             if import_flag:
                 print('\nFile upload Successful.\n')
             else:
-                logging.error('\nFile upload failed.\n')
+                print('\nFile upload failed.\n')
 
     except Exception as e:
-        logging.error('Error in processing latest file: ' + str(e))
+        print('Error in processing latest file: ' + str(e))
 
     print('Finished at: ' + datetime.now().strftime('%d/%m/%Y %H:%M:%S'))
 
