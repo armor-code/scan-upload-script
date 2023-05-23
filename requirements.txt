@@ -3,6 +3,6 @@ charset-normalizer==2.0.12
 docopt==0.6.2
 idna==3.4
 pipreqs==0.4.11
-requests==2.26.0
+requests==2.31.0
 urllib3==1.26.14
 yarg==0.1.9
