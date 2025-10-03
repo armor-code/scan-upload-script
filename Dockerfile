@@ -17,7 +17,10 @@ WORKDIR /app
 COPY requirements.txt ./
 
 # Install packages in venv
-RUN /usr/src/venv/bin/pip install --no-cache-dir -r requirements.txt
+RUN /usr/src/venv/bin/pip install --no-cache-dir -r requirements.txt && \
+    rm -rf /usr/src/venv/lib/python*/site-packages/pip* && \
+    rm -rf /usr/src/venv/lib/python*/site-packages/setuptools* && \
+    find /usr/src/venv/bin -name 'pip*' -delete
 
 COPY script.py ./
 
