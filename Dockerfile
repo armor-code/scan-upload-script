@@ -1,9 +1,11 @@
 FROM alpine:latest
 
 # Update, upgrade, and install dependencies
+# Explicitly upgrade openssl packages to fix CVE-2025-15467
 RUN apk update && \
-    apk upgrade && \
+    apk upgrade --no-cache && \
     apk --update --no-cache add python3 py3-pip openssl && \
+    apk upgrade --no-cache libcrypto3 libssl3 openssl && \
     python3 -m venv /usr/src/venv && \
     /usr/src/venv/bin/pip install --upgrade pip && \
     apk del py3-pip
